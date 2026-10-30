@@ -1,0 +1,11 @@
+# DM02 USB CDC —— 让 Linux 的 ModemManager 忽略本设备
+# 否则 ModemManager 会抢占 /dev/ttyACMx 并把数据吃掉，导致 VOFA+/串口助手读不到。
+#
+# 安装：
+#   sudo cp 99-dm02-cdc.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   然后拔插一次 USB
+#
+# 或临时停用：sudo systemctl stop ModemManager
+#
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", ENV{ID_MM_DEVICE_IGNORE}="1"

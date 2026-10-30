@@ -1,0 +1,19 @@
+CompileFlags:
+  # arm-none-eabi-gcc 专属、Clang 不认识的参数，clangd 解析时剔除。
+  # 注意：-mcpu / -mfpu / -mfloat-abi 这些 Clang 是认识的，保留不动。
+  Remove:
+    - -fstack-usage
+    - -fcyclomatic-complexity
+    - -fno-tree-loop-distribute-patterns
+  # 显式补上 /usr/bin/arm-none-eabi-gcc (10.3.1) 的系统头搜索路径。
+  # 为什么不靠 --query-driver:本工程的 .vscode/settings.json 在 DM02/ 子目录里，
+  # 而 VSCode 工作区根是上级 STM32_Project/，clangd.arguments(含 --query-driver)
+  # 不生效 -> clangd 拿不到 newlib 的 <math.h>，报 "math.h file not found"。
+  # .clangd 是按源文件向上查找、一定会被读到的，所以把系统头路径写死在这里最稳。
+  # 路径来源(换/升级工具链需同步改 10.3.1 版本号):
+  #   echo | /usr/bin/arm-none-eabi-gcc -mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard -E -v -xc -
+  #   看 "#include <...> search starts here" 那几行。
+  Add:
+    - -isystem/usr/lib/arm-none-eabi/include
+    - -isystem/usr/lib/gcc/arm-none-eabi/10.3.1/include
+    - -isystem/usr/lib/gcc/arm-none-eabi/10.3.1/include-fixed
